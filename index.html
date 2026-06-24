@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Developer Portfolio Showcase</title>
+  <!-- Tailwind CSS CDN for quick styling -->
+  <script src="https://jsdelivr.net"></script>
+  <style>
+    /* Smooth hover transitions for cards */
+    .project-card {
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    .project-card:hover {
+      transform: translateY(-6px);
+    }
+  </style>
+</head>
+<body class="bg-gray-900 text-gray-100 min-h-screen font-sans">
+
+  <!-- Header Section -->
+  <header class="max-w-6xl mx-auto px-4 py-8 text-center">
+    <h1 class="text-4xl font-extrabold tracking-tight sm:text-5xl bg-gradient-to-r from-blue-400 to-emerald-400 bg-clip-text text-transparent">
+      Project Portfolio
+    </h1>
+    <p class="mt-3 text-lg text-gray-400">A showcase of my latest work, live demos, and open-source code.</p>
+  </header>
+
+  <!-- Controls: Search & Category Filter -->
+  <section class="max-w-6xl mx-auto px-4 mb-12">
+    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 bg-gray-800 p-4 rounded-xl border border-gray-700">
+      
+      <!-- Search Input -->
+      <div class="w-full md:w-72">
+        <input 
+          type="text" 
+          id="search-input" 
+          placeholder="Search by title or tech..." 
+          class="w-full px-4 py-2 bg-gray-950 border border-gray-700 rounded-lg focus:outline-none focus:border-blue-500 text-gray-200 text-sm"
+        >
+      </div>
+
+      <!-- Filter Buttons -->
+      <div id="filter-buttons" class="flex flex-wrap gap-2">
+        <button data-category="all" class="filter-btn px-4 py-2 text-sm font-medium rounded-lg bg-blue-600 text-white cursor-pointer transition">All</button>
+        <button data-category="Web" class="filter-btn px-4 py-2 text-sm font-medium rounded-lg bg-gray-700 hover:bg-gray-600 text-gray-200 cursor-pointer transition">Web</button>
+        <button data-category="Mobile" class="filter-btn px-4 py-2 text-sm font-medium rounded-lg bg-gray-700 hover:bg-gray-600 text-gray-200 cursor-pointer transition">Mobile</button>
+        <button data-category="AI" class="filter-btn px-4 py-2 text-sm font-medium rounded-lg bg-gray-700 hover:bg-gray-600 text-gray-200 cursor-pointer transition">AI</button>
+        <button data-category="Python" class="filter-btn px-4 py-2 text-sm font-medium rounded-lg bg-gray-700 hover:bg-gray-600 text-gray-200 cursor-pointer transition">Python</button>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Projects Grid -->
+  <main class="max-w-6xl mx-auto px-4 pb-24">
+    <!-- Responsive Grid: Mobile 1, Tablet 2, Desktop 3-4 columns -->
+    <div id="projects-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-8">
+      <!-- Dynamic cards load here -->
+      <p class="text-gray-400 col-span-full text-center">Loading projects...</p>
+    </div>
+  </main>
+
+  <!-- JavaScript Logic -->
+  <script>
+    let projectsData = [];
+    let currentCategory = 'all';
+    let searchQuery = '';
+
+    const grid = document.getElementById('projects-grid');
+    const searchInput = document.getElementById('search-input');
+    const filterButtons = document.querySelectorAll('.filter-btn');
+
+    // 1. Fetch Data from JSON
+    async function fetchProjects() {
+      try {
+        const response = await fetch('projects.json');
+        if (!response.ok) throw new Error('Failed to fetch project data');
+        projectsData = await response.json();
+        renderProjects();
+      } catch (error) {
+        grid.innerHTML = `<p class="text-red-400 col-span-full text-center">Error loading projects: ${error.message}</p>`;
+      }
+    }
+
+    // 2. Render Filtered & Searched Projects
+    function renderProjects() {
+      // Filter logic
+      const filtered = projectsData.filter(project => {
+        const matchesCategory = currentCategory === 'all' || project.category === currentCategory;
+        
+        const matchesSearch = project.title.toLowerCase().includes(searchQuery) || 
+                              project.technologies.some(tech => tech.toLowerCase().includes(searchQuery)) ||
+                              project.description.toLowerCase().includes(searchQuery);
+        
+        return matchesCategory && matchesSearch;
+      });
+
+      // Clear grid
+      grid.innerHTML = '';
+
+      if (filtered.length === 0) {
+        grid.innerHTML = `<p class="text-gray-500 col-span-full text-center py-12">No projects found matching your criteria.</p>`;
+        return;
+      }
+
+      // Generate HTML templates dynamically
+      filtered.forEach(project => {
+        const techBadges = project.technologies.map(tech => 
+          `<span class="text-xs font-semibold px-2.5 py-0.5 bg-gray-800 text-gray-300 rounded border border-gray-700">${tech}</span>`
+        ).join('');
+
+        const cardHtml = `
+          <article class="project-card bg-gray-950 border border-gray-800 rounded-xl overflow-hidden shadow-xl flex flex-col">
+            <div class="h-48 overflow-hidden bg-gray-800 relative">
+              <img src="${project.image_url}" alt="${project.title}" class="w-full h-full object-cover" loading="lazy">
+              <span class="absolute top-3 right-3 bg-blue-900/80 backdrop-blur-sm text-blue-300 text-xs font-bold px-3 py-1 rounded-full border border-blue-700/50">
+                ${project.category}
+              </span>
+            </div>
+            <div class="p-5 flex flex-col flex-grow">
+              <h3 class="text-xl font-bold text-white mb-2">${project.title}</h3>
+              <p class="text-gray-400 text-sm mb-4 line-clamp-3 flex-grow">${project.description}</p>
+              <div class="flex flex-wrap gap-1.5 mb-6">
+                ${techBadges}
+              </div>
+              <div class="flex gap-3 mt-auto">
+                <a href="${project.live_demo_link}" target="_blank" rel="noopener noreferrer" 
+                   class="flex-1 text-center py-2 px-3 bg-blue-600 hover:bg-blue-500 active:scale-98 text-white font-medium text-sm rounded-lg transition shadow-md shadow-blue-900/20">
+                  🔗 Live Demo
+                </a>
+                <a href="${project.github_link}" target="_blank" rel="noopener noreferrer" 
+                   class="flex-1 text-center py-2 px-3 bg-gray-800 hover:bg-gray-700 active:scale-98 text-gray-200 font-medium text-sm rounded-lg transition border border-gray-700">
+                  💻 View Code
+                </a>
+              </div>
+            </div>
+          </article>
+        `;
+        grid.insertAdjacentHTML('beforeend', cardHtml);
+      });
+    }
+
+    // 3. Category Filter Click Handler
+    filterButtons.forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        // Reset active classes
+        filterButtons.forEach(b => b.classList.replace('bg-blue-600', 'bg-gray-700'));
+        filterButtons.forEach(b => b.classList.add('hover:bg-gray-600', 'text-gray-200'));
+        
+        // Set active class on target
+        e.target.classList.replace('bg-gray-700', 'bg-blue-600');
+        e.target.classList.remove('hover:bg-gray-600', 'text-gray-200');
+
+        currentCategory = e.target.getAttribute('data-category');
+        renderProjects();
+      });
+    });
+
+    // 4. Search Filter Input Handler
+    searchInput.addEventListener('input', (e) => {
+      searchQuery = e.target.value.toLowerCase();
+      renderProjects();
+    });
+
+    // Initialize Page
+    fetchProjects();
+  </script>
+</body>
+</html>
