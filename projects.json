@@ -1,0 +1,32 @@
+[
+  {
+    "id": 1,
+    "title": "E-Commerce Platform",
+    "description": "A fully responsive online store with a dynamic shopping cart and checkout system.",
+    "image_url": "https://unsplash.com",
+    "live_demo_link": "https://example.com",
+    "github_link": "https://github.com",
+    "category": "Web",
+    "technologies": ["HTML", "Tailwind CSS", "JavaScript"]
+  },
+  {
+    "id": 2,
+    "title": "AI Image Generator",
+    "description": "A web application that connects to an OpenAI API to generate images from text prompts.",
+    "image_url": "https://unsplash.com",
+    "live_demo_link": "https://example.com",
+    "github_link": "https://github.com",
+    "category": "AI",
+    "technologies": ["Python", "React", "API"]
+  },
+  {
+    "id": 3,
+    "title": "Task Manager App",
+    "description": "A productivity mobile web app featuring drag-and-drop task status updates.",
+    "image_url": "https://unsplash.com",
+    "live_demo_link": "https://example.com",
+    "github_link": "https://github.com",
+    "category": "Mobile",
+    "technologies": ["JavaScript", "CSS Grid", "Node.js"]
+  }
+]
